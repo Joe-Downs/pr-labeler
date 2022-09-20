@@ -11,6 +11,9 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: foobar
+      run: echo "Hello, We're on the foobar branch"
+      shell: bash
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
