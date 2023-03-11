@@ -2,15 +2,19 @@
 
 """
 
-The script applies a label in the form "Target: {branchName}. If necessary, it
-removes labels in the same form, but NOT for the target branch. For instance, if
-someone edited the target branch from v4.0.x to v5.0.x
+The script applies a label and milestone in the form "Target: {branchName}. If
+necessary, it removes labels and milestones in the same form, but NOT for the
+target branch. For instance, if someone edited the target branch from v4.0.x to
+v5.0.x
 
 """
 
+"""
 import os
-import re
 import sys
+"""
+
+import re
 
 from github import Github
 
@@ -31,17 +35,19 @@ if (GITHUB_BASE_REF is None or
 
 # ==============================================================================
 
-# Given a pullRequest object and list of existing labels, the function checks
-# what labels are currently on the pull request, removes any matching the form
-# "Target: {branch}" (if {branch} is not the current target branch), and adds
-# the correct label.
+targetPrefix = "Target: "
+
+# Given a pullRequest object and list of existing labels or milestones, the
+# function checks which are currently on the pull request and if , removes any
+# matching the form "Target: {branch}" (if {branch} is not the current target
+# branch), and adds the correct label or milestone.
 #
 # Because the GH API automatically creates a label when applying it (if it
 # doesn't exist), we try to get a label object to check if the label has been
 # created before we add (and create) it ourselves.
+
 def ensureLabels(pullRequest, repo):
     needsLabel = True
-    targetPrefix = "Target: "
     targetLabel = f"{targetPrefix}{GITHUB_BASE_REF}"
     try:
         repo.get_label(targetLabel)
@@ -60,10 +66,21 @@ def ensureLabels(pullRequest, repo):
         pullRequest.add_to_labels(targetLabel)
     return None
 
+def ensureMilestones(pullRequest, repo):
+    targetVersopm = re.search(r"v\d.\d.", GITHUB_BASE_REF).group(0)
+    for milestone in repo.get_milestones(state=open):
+        if milestone.title.startswith(targetVersion):
+            print(f"Setting milestone to '{milestone.title}'")
+            pullRequest.edit(milestone=milestone)
+    return None
+
+
 # ==============================================================================
 
 g = Github(GITHUB_TOKEN)
 repo = g.get_repo(GITHUB_REPOSITORY)
 prNum = int(PR_NUM)
 pr = repo.get_pull(prNum)
+issue = repo.get_issue(prNum)
 ensureLabels(pr, repo)
+ensureMilestones(issue, repo)
