@@ -68,9 +68,12 @@ def ensureMilestones(pullRequest, repo):
     for milestone in repo.get_milestones(state="open"):
         if milestone.title.startswith(targetVersion):
             print(f"Setting milestone to '{milestone.title}'")
-            pullRequest.edit(milestone=None)
+            pullRequest.edit(milestone=milestone)
             print(f"Finished setting milestone. Leaving ensureMilestones()")
-            print(f"PR Milestone: {pullRequest.milestone.title}")
+            if pullRequest.milestone is not None:
+                print(f"PR Milestone: {pullRequest.milestone.title}")
+            else:
+                print(f"No milestone on the PR")
             break
     return None
 
