@@ -65,7 +65,7 @@ def ensureLabels(pullRequest, repo):
 
 def ensureMilestones(pullRequest, repo):
     targetVersopm = re.search(r"v\d.\d.", GITHUB_BASE_REF).group(0)
-    for milestone in repo.get_milestones(state=open):
+    for milestone in repo.get_milestones(state="open"):
         if milestone.title.startswith(targetVersion):
             print(f"Setting milestone to '{milestone.title}'")
             pullRequest.edit(milestone=milestone)
