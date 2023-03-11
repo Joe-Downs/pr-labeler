@@ -9,12 +9,9 @@ v5.0.x
 
 """
 
-"""
+import re
 import os
 import sys
-"""
-
-import re
 
 from github import Github
 
