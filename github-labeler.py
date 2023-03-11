@@ -68,7 +68,7 @@ def ensureMilestones(pullRequest, repo):
     for milestone in repo.get_milestones(state="open"):
         if milestone.title.startswith(targetVersion):
             print(f"Setting milestone to '{milestone.title}'")
-            pullRequest.edit(milestone=milestone)
+            pullRequest.edit(milestone=None)
             print(f"Finished setting milestone. Leaving ensureMilestones()")
             break
     return None
@@ -80,6 +80,8 @@ g = Github(GITHUB_TOKEN)
 repo = g.get_repo(GITHUB_REPOSITORY)
 prNum = int(PR_NUM)
 pr = repo.get_pull(prNum)
+fakeIssue = repo.get_issue(9999)
 issue = repo.get_issue(prNum)
 ensureLabels(pr, repo)
 ensureMilestones(issue, repo)
+ensureMilestones(fakeIssue, repo)
